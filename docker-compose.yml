@@ -1,0 +1,55 @@
+
+version: '3.8'
+
+services:
+  app:
+    image: openjdk:17-jdk-slim
+    container_name: order_product_app
+    depends_on:
+      - mysql
+      - mongodb
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/orderProduct
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: GISMA
+      SPRING_DATA_MONGODB_HOST: mongodb
+      SPRING_DATA_MONGODB_PORT: 27017
+      SPRING_DATA_MONGODB_DATABASE: productReviews
+    volumes:
+      - .:/usr/src/app
+    working_dir: /usr/src/app
+    command: ./mvnw spring-boot:run # Assuming you have a wrapper script and mvn command for running, adjust if needed
+    networks:
+      - order_network
+
+  mysql:
+    image: mysql:8.0
+    container_name: order_product_mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: GISMA
+      MYSQL_DATABASE: orderProduct
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - order_network
+
+  mongodb:
+    image: mongo:5.0
+    container_name: order_product_mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - order_network
+
+volumes:
+  mysql_data:
+  mongo_data:
+
+networks:
+  order_network:
